@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
+  Alert,
   Dimensions,
   ImageBackground,
   ScrollView,
@@ -11,6 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import api from "../services/api.js";
 
 const { width } = Dimensions.get("window");
 
@@ -18,13 +20,38 @@ export default function SignupPage() {
   const router = useRouter();
 
   const [email, setEmail] = useState("");
-  const [username, setUsername] = useState("");
+  const [displayName, setDisplayName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  const handleRegister = async () => {
+    // Validasi confirm password
+    if (password !== confirmPassword) {
+      Alert.alert("Error", "Password dan konfirmasi password tidak cocok!");
+      return;
+    }
+
+    try {
+      const res = await api.post("/api/auth/register", {
+        displayName,
+        email,
+        password,
+      });
+
+        console.log("Register sukses, token dan nama disimpan");
+        router.replace("/"); 
+   
+    } catch (error) {
+      console.error("Register error:", error.response?.data || error.message);
+      Alert.alert(
+        "Register gagal",
+        error.response?.data?.message || error.message
+      );
+    }
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
-
       <ImageBackground
         source={require("../assets/images/background.png")}
         style={styles.headerBg}
@@ -39,14 +66,11 @@ export default function SignupPage() {
         </TouchableOpacity>
       </ImageBackground>
 
-
       <View style={styles.card}>
-   
         <View style={styles.headerText}>
           <Text style={styles.title}>Selamat Datang di Transzity!</Text>
           <Text style={styles.subtitle}>Silahkan daftarkan akun anda</Text>
         </View>
-
 
         <TextInput
           placeholder="Email"
@@ -57,8 +81,8 @@ export default function SignupPage() {
         />
         <TextInput
           placeholder="Nama Pengguna"
-          value={username}
-          onChangeText={setUsername}
+          value={displayName}
+          onChangeText={setDisplayName}
           style={styles.input}
           placeholderTextColor="#aaa"
         />
@@ -79,15 +103,10 @@ export default function SignupPage() {
           placeholderTextColor="#aaa"
         />
 
- 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => router.push("/")}
-        >
+        <TouchableOpacity style={styles.button} onPress={handleRegister}>
           <Text style={styles.buttonText}>Daftar</Text>
         </TouchableOpacity>
 
- 
         <Text style={styles.footer}>
           Sudah memiliki akun?{" "}
           <Text style={styles.login} onPress={() => router.push("/login")}>

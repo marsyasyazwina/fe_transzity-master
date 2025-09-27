@@ -1,9 +1,48 @@
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useEffect, useState } from "react";
+import {
+  Alert,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+
 
 export default function HomePage() {
   const router = useRouter();
+  const [displayName, setDisplayName] = useState("User"); 
+
+  useEffect(() => {
+    const getUserData = async () => {
+      const token = await AsyncStorage.getItem("token");
+      const name = await AsyncStorage.getItem("displayName");
+
+      console.log(token, "namaaaa")
+      if (!token) {
+        router.replace("/login"); 
+      } 
+    };
+    getUserData();
+  }, []);
+
+  const handleLogout = async () => {
+    Alert.alert("Konfirmasi", "Apakah Anda yakin ingin logout?", [
+      { text: "Batal" },
+      {
+        text: "Logout",
+        onPress: async () => {
+          await AsyncStorage.removeItem("token");
+          // await AsyncStorage.removeItem("displayName");
+          router.replace("/login");
+        },
+      },
+    ]);
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -13,16 +52,15 @@ export default function HomePage() {
             <Ionicons name="person" size={40} color="#fff" />
           </View>
           <View style={{ marginLeft: 10 }}>
-            <Text style={styles.greeting}>Halo, Sue Shei</Text>
+            <Text style={styles.greeting}>Halo!</Text>
             <Text style={styles.brand}>Transzity</Text>
           </View>
         </View>
 
-        <TouchableOpacity style={styles.iconWrapper}>
-          <Ionicons name="notifications-outline" size={22} color="#3b6ef5" />
+        <TouchableOpacity style={styles.iconWrapper} onPress={handleLogout}>
+          <Ionicons name="log-out-outline" size={22} color="#3b6ef5" />
         </TouchableOpacity>
       </View>
-
 
       <View style={styles.card}>
         <Text style={styles.cardDate}>12/10/2021</Text>
@@ -32,7 +70,6 @@ export default function HomePage() {
         </TouchableOpacity>
       </View>
 
- 
       <View style={styles.transport}>
         <TouchableOpacity style={styles.menuItem}>
           <View style={[styles.iconWrapper, { backgroundColor: "#3b6ef5" }]}>
@@ -56,7 +93,6 @@ export default function HomePage() {
         </TouchableOpacity>
       </View>
 
-   
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Perjalanan Terbaru</Text>
 
@@ -94,7 +130,6 @@ export default function HomePage() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff", padding: 20 },
-
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -105,7 +140,6 @@ const styles = StyleSheet.create({
   profile: { flexDirection: "row", alignItems: "center" },
   greeting: { fontSize: 18, fontWeight: "bold" },
   brand: { color: "#3b6ef5", fontSize: 14 },
-
   iconProfile: {
     backgroundColor: "#3b6ef5",
     padding: 12,
@@ -114,13 +148,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   iconWrapper: {
-  backgroundColor: "#e6edff", 
-  padding: 10,
-  borderRadius: 12,
-  justifyContent: "center",
-  alignItems: "center",
-},
-
+    backgroundColor: "#e6edff",
+    padding: 10,
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   card: {
     backgroundColor: "#3b6ef5",
     borderRadius: 14,
@@ -130,18 +163,8 @@ const styles = StyleSheet.create({
     minHeight: 200,
     justifyContent: "center",
   },
-  cardDate: {
-    color: "#fff",
-    textAlign: "right",
-    fontSize: 13,
-    marginBottom: 120,
-  },
-  cardBalance: {
-    color: "#fff",
-    fontSize: 25,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
+  cardDate: { color: "#fff", textAlign: "right", fontSize: 13, marginBottom: 120 },
+  cardBalance: { color: "#fff", fontSize: 25, fontWeight: "bold", marginBottom: 10 },
   addButton: {
     position: "absolute",
     bottom: 20,
@@ -150,7 +173,6 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     padding: 10,
   },
-
   transport: {
     flexDirection: "row",
     justifyContent: "space-around",
@@ -158,7 +180,6 @@ const styles = StyleSheet.create({
   },
   menuItem: { alignItems: "center" },
   menuText: { marginTop: 5, fontSize: 13 },
-
   section: { marginBottom: 20 },
   sectionTitle: { fontWeight: "bold", marginBottom: 15, fontSize: 16 },
   tripCard: {

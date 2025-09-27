@@ -1,7 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
+  Alert,
   Dimensions,
   ImageBackground,
   ScrollView,
@@ -11,6 +13,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import api from '../services/api.js';
+
 
 const { width } = Dimensions.get("window");
 
@@ -19,6 +23,36 @@ export default function LoginPage() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert("Error", "Email dan password wajib diisi!");
+      return;
+    }
+
+    console.log(email, password)
+
+    try {
+      const res = await api.post("/api/auth/login", { email, password });
+   
+      const token = res.data.token;
+
+      if (token !== null) {
+        await AsyncStorage.setItem("token", token);
+
+        console.log("Login sukses, token disimpan");
+        router.replace("/"); 
+      } else {
+        Alert.alert("Login gagal", "Token tidak diterima dari server");
+      }
+    } catch (error) {
+      console.error("Login error:", error.response?.data || error.message);
+      Alert.alert(
+        "Login gagal",
+        error.response?.data?.message || error.message
+      );
+    }
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -69,9 +103,7 @@ export default function LoginPage() {
 
         <TouchableOpacity
           style={styles.button}
-          onPress={() => {
-            router.push("/");
-          }}
+          onPress={handleLogin}
         >
           <Text style={styles.buttonText}>Masuk</Text>
         </TouchableOpacity>
@@ -79,7 +111,7 @@ export default function LoginPage() {
  
         <Text style={styles.footer}>
           Belum memiliki akun?{" "}
-          <Text style={styles.login} onPress={() => router.push("/signup")}>
+          <Text style={styles.login} onPress={() => router.push("/signUp")}>
             Daftar
           </Text>
         </Text>

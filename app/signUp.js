@@ -25,7 +25,6 @@ export default function SignupPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleRegister = async () => {
-    // Validasi confirm password
     if (password !== confirmPassword) {
       Alert.alert("Error", "Password dan konfirmasi password tidak cocok!");
       return;
@@ -57,7 +56,7 @@ export default function SignupPage() {
         style={styles.headerBg}
         resizeMode="cover"
       >
-        {/* Tombol Back */}
+
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => router.push("/onboarding")}

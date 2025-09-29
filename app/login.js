@@ -79,7 +79,7 @@ export default function LoginPage() {
           <Text style={styles.subtitle}>Masuk ke akun anda</Text>
         </View>
 
-        {/* Input */}
+
         <TextInput
           placeholder="Email"
           value={email}
